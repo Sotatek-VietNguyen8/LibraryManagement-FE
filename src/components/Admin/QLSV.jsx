@@ -1,112 +1,113 @@
-import { Search } from 'lucide-react';
-import React, { useState, useCallback, useEffect } from 'react';
-import { useAuthStore } from '../../store/useAuthStore';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { useAuthStore } from '../../store/useAuthStore'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 const QLSV = () => {
 
-  const { findUser, getUser, updateUser, deleteUser } = useAuthStore();
-  const [searchText, setSearchText] = useState('');
-  const [userData, setUserData] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditUser, setIsEditUser] = useState(false);
+  const { findUser, getUser, updateUser, deleteUser } = useAuthStore()
+  const [searchText, setSearchText] = useState('')
+  const [userData, setUserData] = useState([])
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isEditUser, setIsEditUser] = useState(false)
 
   const navigate = useNavigate()
 
   const handleFindUser = useCallback(async () => {
     if (!searchText) {
-      toast.error('Vui lòng nhập thông tin');
-      return;
+      toast.error('Vui lòng nhập thông tin')
+      return
     }
     try {
-      const users = await findUser(searchText);
-      console.log("Users từ findUser:", users);
+      const users = await findUser(searchText)
+      console.log("Users từ findUser:", users)
 
       if (users && users.length > 0) {
-        setSelectedUser(users[0]);
+        setSelectedUser(users[0])
       } else {
-        setSelectedUser(null);
-        toast.error('Không tìm thấy sinh viên');
+        setSelectedUser(null)
+        toast.error('Không tìm thấy sinh viên')
       }
     } catch (error) {
-      console.error('Lỗi tìm kiếm', error);
-      toast.error('Có lỗi xảy ra khi tìm kiếm');
+      console.error('Lỗi tìm kiếm', error)
+      toast.error('Có lỗi xảy ra khi tìm kiếm')
     }
-  }, [searchText, findUser]);
+  }, [searchText, findUser])
 
   const handleChange = (e) => {
-    setSearchText(e.target.value);
-  };
+    setSearchText(e.target.value)
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const users = await getUser();
+        const users = await getUser()
         if (users) {
-          setUserData(users);
+          setUserData(users)
         } else {
-          setUserData([]);
+          setUserData([])
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to fetch user data.");
-        setUserData([]);
+        console.error("Error fetching user data:", error)
+        toast.error("Failed to fetch user data.")
+        setUserData([])
       }
-    };
-    fetchData();
-  }, [getUser]);
+    }
+    fetchData()
+  }, [getUser])
 
   const handleRowClick = (user) => {
-    setSelectedUser(user);
-  };
+    setSelectedUser(user)
+  }
 
   const handleEditClick = () => {
-    setIsEditUser(true);
-  };
+    setIsEditUser(true)
+  }
 
   const handleUpdateUser = async () => {
     try {
       if (!selectedUser) {
-        toast.error("Vui long chon sinh vien de sua ");
-        return;
+        toast.error("Vui long chon sinh vien de sua ")
+        return
       }
-      await updateUser(selectedUser);
-      toast.success("User updated successfully!");
-      setIsEditUser(false);
+      await updateUser(selectedUser)
+      toast.success("User updated successfully!")
+      setIsEditUser(false)
       const updateData = await getUser()
       setUserData(updateData)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật.");
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật.")
     }
-  };
+  }
   const handleDeleteUser = async () => {
     try {
       if (!selectedUser) {
-        toast.error("Vui lòng chọn sinh viên để xóa ");
-        return;
+        toast.error("Vui lòng chọn sinh viên để xóa ")
+        return
       }
-      await deleteUser(selectedUser);
-      toast.success("User deleted successfully!");
-      setSelectedUser(null);
+      await deleteUser(selectedUser)
+      toast.success("User deleted successfully!")
+      setSelectedUser(null)
       const updateData = await getUser()
       setUserData(updateData)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật.");
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật.")
     }
-  };
+  }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target; 
+    const { name, value } = e.target 
     setSelectedUser(prevState => ({
       ...prevState,
       [name]: value
-    }));
-  };
+    }))
+  }
 
   const handleBack = ()=>{
     navigate(-1)
   }
+  
 
   return (
     <div className="bg-[#F0F0F0] rounded shadow-sm border border-gray-300">
@@ -276,12 +277,12 @@ const QLSV = () => {
           <table className='min-w-full table-auto border-collapse border border-gray-300'>
             <thead className='bg-gray-100 sticky top-0'>
               <tr>
-                <th className=' py-2 px-3 border text-sm'>STT</th>
-                <th className=' py-2 px-3 border text-sm'>Ma sinh vien</th>
-                <th className=' py-2 px-3 border text-sm'>Ho va ten</th>
-                <th className=' py-2 px-3 border text-sm'>Lop</th>
-                <th className=' py-2 px-3 border text-sm'>SDT</th>
-                <th className=' py-2 px-3 border text-sm'>Email</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>STT</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>Ma sinh vien</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>Ho va ten</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>Lop</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>SDT</th>
+                <th className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>Email</th>
               </tr>
             </thead>
 
@@ -290,12 +291,12 @@ const QLSV = () => {
                 <tr key={index} className={`${index % 3 === 0 ? 'bg-white' : 'bg-gray-300'}`}
                   onClick={()=>handleRowClick(user)}
                 >
-                  <td className=' py-2 px-3 border text-sm'>{index + 1}</td>
-                  <td className=' py-2 px-3 border text-sm'>{user.Identification}</td>
-                  <td className=' py-2 px-3 border text-sm'>{user.userName}</td>
-                  <td className=' py-2 px-3 border text-sm'>{user.lop}</td>
-                  <td className=' py-2 px-3 border text-sm'>{user.SDT}</td>
-                  <td className=' py-2 px-3 border text-sm'>{user.email}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{index + 1}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{user.Identification}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{user.userName}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{user.lop}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{user.SDT}</td>
+                  <td className=' py-2 px-3 border text-sm text-gray-600 uppercase tracking-wider'>{user.email}</td>
                 </tr>
               ))}
             </tbody>
@@ -341,7 +342,7 @@ const QLSV = () => {
       </div>
 
     </div>
-  );
-};
+  )
+}
 
-export default QLSV;
+export default QLSV
