@@ -26,6 +26,27 @@ export const useDocketStore = create((set) => ({
             set({dockets: []})
         }
     },
+    deleteDocket: async(selectDocket)=>{
+        try {
+            const {_id} = selectDocket
+            await axiosInstance.delete(`/deleteDocket/${_id}`)
+        } catch (error) {
+            console.error("Error in deleting docket ", error)
+            toast.error(error.response?.data?.message || "Failed to delete docket.")
+            return null
+        }
+    },
+
+    searchDocket: async(infoDocket)=>{
+        try {
+            const res = await axiosInstance.post("/searchDocket",{infoDocket})
+            console.log('Search Results: ', res.data)
+            return res.data
+        } catch (error) {
+            toast.error(error.response.data.message)
+            return null
+        }
+    },
 
     checkAndUpdateStatus: async()=>{
         try {
@@ -45,4 +66,6 @@ export const useDocketStore = create((set) => ({
         }
     },
 
+    setDockets: (newDocket) =>({dockets: newDocket})
+    
 }))

@@ -102,6 +102,10 @@ const QLSach = () => {
       [name]: value
     }))
   }
+  
+  const handleBack = ()=>{
+    navigate(-1)
+  }
 
   return (
     <div className="bg-[#F0F0F0] rounded shadow-sm border border-gray-300">
@@ -212,6 +216,21 @@ const QLSach = () => {
                     <p className="px-4 py-2.5 bg-gray-100 rounded-lg border border-gray-200">{selectedBook.soLuong || 'N/A'}</p>
                   )}
                 </div>
+
+                <div className="flex flex-col space-y-1">
+                  <label className="text-sm text-gray-600">URL</label>
+                  {isEditBook ? (
+                    <input
+                    type="text"
+                    name="pdfUrl"
+                    value={selectedBook.pdfUrl || ''}
+                    onChange={handleInputChange}
+                    className="px-4 py-2.5 bg-white rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500"
+                  />
+                  ): (
+                    <p className="px-4 py-2.5 bg-gray-100 rounded-lg border border-gray-200">{selectedBook.pdfUrl || 'N/A'}</p>
+                  )}
+                </div>
               </div>
 
             </div>
@@ -241,6 +260,10 @@ const QLSach = () => {
                   <label className="text-sm text-gray-600">Số lượng</label>
                   <p className="px-4 py-2.5 bg-gray-100 rounded-lg border border-gray-200">N/A</p>
                 </div>
+                <div className="flex flex-col space-y-1">
+                  <label className="text-sm text-gray-600">URL PDF</label>
+                  <p className="px-4 py-2.5 bg-gray-100 rounded-lg border border-gray-200">N/A</p>
+                </div>
               </div>
 
             </div>
@@ -260,6 +283,8 @@ const QLSach = () => {
                 <th className=' py-2 px-3 border text-sm'>Tac gia</th>
                 <th className=' py-2 px-3 border text-sm'>Nha xuat ban</th>
                 <th className=' py-2 px-3 border text-sm'>So luong</th>
+                <th className=' py-2 px-3 border text-sm'>So sach con lai</th>
+                <th className=' py-2 px-3 border text-sm'>PDF URL</th>
               </tr>
             </thead>
 
@@ -274,6 +299,8 @@ const QLSach = () => {
                   <td className=' py-2 px-3 border text-sm'>{book.author}</td>
                   <td className=' py-2 px-3 border text-sm'>{book.NXB}</td>
                   <td className=' py-2 px-3 border text-sm'>{book.soLuong}</td>
+                  <td className=' py-2 px-3 border text-sm'>{book.soLuongCon}</td>
+                  <td className=' py-2 px-3 border text-sm'>{book.pdfUrl}</td>
                 </tr>
               ))}
             </tbody>
@@ -312,8 +339,8 @@ const QLSach = () => {
         <button  onClick = {handleDeleteBook} className="border border-gray-950 bg-gray-950 min-w-[100px]">
           Xóa
         </button>
-        <button  className="border border-gray-950 bg-gray-950 min-w-[100px]">
-          Làm Mới
+        <button onClick={handleBack} className="border border-gray-950 bg-gray-950 min-w-[100px]">
+          Back
         </button>
       </div>
 

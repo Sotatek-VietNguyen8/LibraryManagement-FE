@@ -104,6 +104,10 @@ const QLSV = () => {
     }));
   };
 
+  const handleBack = ()=>{
+    navigate(-1)
+  }
+
   return (
     <div className="bg-[#F0F0F0] rounded shadow-sm border border-gray-300">
       <div className="p-5 border-b border-gray-300 bg-gradient-to-r from-gray-200 to-gray-300">
@@ -331,8 +335,8 @@ const QLSV = () => {
         <button onClick={handleDeleteUser} className="border border-gray-950 bg-gray-950 min-w-[100px]">
           Xóa
         </button>
-        <button  className="border border-gray-950 bg-gray-950 min-w-[100px]">
-          Làm Mới
+        <button  onClick={handleBack}className="border border-gray-950 bg-gray-950 min-w-[100px]">
+          Back
         </button>
       </div>
 

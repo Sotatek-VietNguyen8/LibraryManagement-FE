@@ -28,7 +28,6 @@ const Navbar = () => {
                             <span className="hidden sn:inline">Setting</span>
                         </Link>
 
-
                         {authUser && (
                             <>
                                 <Link
@@ -45,9 +44,7 @@ const Navbar = () => {
                                 </button>
                             </>
                         )}
-
                     </div>
-
                 </div>
             </div>
         </header>

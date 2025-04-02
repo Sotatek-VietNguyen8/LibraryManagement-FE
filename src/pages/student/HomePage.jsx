@@ -12,11 +12,10 @@ const HomePage = () => {
           <div className="flex flex-col md:flex-row">
             {/* Student Information */}
             <StudentInfo />
-            {/* Borrowed Books */}
-            <BorrowedBooks />
+            <BookSearch />
           </div>
-  
-          <BookSearch />
+          {/* Borrowed Books */}
+          <BorrowedBooks />
         </div>
       </div>
     );

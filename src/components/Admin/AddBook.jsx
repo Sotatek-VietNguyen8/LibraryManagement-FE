@@ -10,6 +10,7 @@ const AddBook = () => {
         author: '',
         NXB: '',
         soLuong: '',
+        pdfUrl: '',
         description: '',
     }) 
     const [isSubmitting, setIsSubmitting] = useState(false) 
@@ -30,6 +31,7 @@ const AddBook = () => {
                     author: '',
                     NXB: '',
                     soLuong: '',
+                    pdfUrl: '',
                     description: '',
                 }) 
             }
@@ -120,6 +122,18 @@ const AddBook = () => {
                                         required
                                     />
                                 </div>
+                                <div className="form-control space-y-2">
+                                    <label className="label">
+                                        <span className="label-text text-lg font-medium  ">PdfURL</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input input-bordered"
+                                        placeholder="URL"
+                                        value={formData.pdfUrl}
+                                        onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -136,7 +150,7 @@ const AddBook = () => {
                                 rows={4}
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
+                        <button type="submit" className="btn btn-primary w-full mt-4 " disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4" />

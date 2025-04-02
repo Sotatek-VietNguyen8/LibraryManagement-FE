@@ -24,7 +24,7 @@ export const useBookStore = create((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const res = await axiosInstance.get("/getBook")
-      set({ books: res.data.filterBook, error: null, isLoading: false })
+      set({ books: res.data, error: null, isLoading: false })
       return res.data
     } catch (error) {
       console.error("Error fetching books:", error)
@@ -46,25 +46,26 @@ export const useBookStore = create((set, get) => ({
 
   updateBook: async (selectedBook) => {
     try {
-      const { _id, IdBook, bookName, author, NXB, soLuong } = selectedBook
+      const { _id, IdBook, bookName, author, NXB, soLuong, pdfUrl } = selectedBook
       const res = await axiosInstance.post(`/updateBook/${_id}`, {
         IdBook,
         bookName,
         author,
         NXB,
         soLuong,
+        pdfUrl,
       })
 
-      if (res.data.updateBook) {
+      if (res.data) {
         set((state) => ({
           books: state.books.map((book) =>
             book._id === selectedBook._id ? res.data.updatedBook : book
           ),
         }))
-        toast.success("Book updated successfully!")
+        toast.success("Sách đã được cập nhật thành công!")
         return res.data
       } else {
-        toast.error("Failed to update book.")
+        toast.error("Không thể cập nhật sách.")
         return null
       }
     } catch (error) {
@@ -109,4 +110,13 @@ export const useBookStore = create((set, get) => ({
       return null
     }
   },
+  getPDF: async(fileName)=>{
+    try {
+      const res = await axiosInstance.get(`/getPDF/${fileName}`,{ responseType: 'blob'})
+      const fileURL = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      window.open(fileURL)
+    } catch (error) {
+      console.error("Error in getting book ", error)
+    }
+  }
 }))

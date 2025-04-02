@@ -1,11 +1,14 @@
+
+
 import React, { useState, useEffect } from 'react'
 import Navbar from '../Navbar'
-import { Search, UserPlus } from 'lucide-react'
+import { ArrowLeft, Search, UserPlus } from 'lucide-react'
 import { useCardStore } from '../../store/useCardStore'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 const QLThe = () => {
-    const { addCard, getCard, searchCard, cards, setCards } = useCardStore()
+    const { addCard, getCard, searchCard, cards, setCards, checkAndUpdateStatusCard } = useCardStore()
     const [searchText, setSearchText] = useState('')
     const [isAddingCard, setIsAddCard] = useState(false)
     const [formData, setFormData] = useState({
@@ -19,8 +22,15 @@ const QLThe = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
-        getCard() 
-    }, [getCard])
+        getCard()
+        checkAndUpdateStatusCard()
+    }, [getCard, checkAndUpdateStatusCard])
+    useEffect(()=>{
+        setFormData((prveFormData)=>({
+            ...prveFormData,
+            IdCard: prveFormData.Identification
+        }))
+    },[formData.Identification])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -67,12 +77,26 @@ const QLThe = () => {
         }
     }
 
+    const navigate = useNavigate()
+    const handleBack = ()=>{
+        navigate(-1)
+    }
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <div className='container mx-auto px-4 pt-20 pb-10' style={{ paddingTop: '50px' }}>
                 <div className='w-full max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-sm'>
-                    <h1 className='text-2xl font-extralight text-left text-gray-950 mb-9'>Quản Lí Thẻ Thư Viện</h1>
+                    <h1 className='text-2xl font-extralight text-left text-gray-950 mb-2'>Quản Lí Thẻ Thư Viện</h1>
+                    <div className='flex justify-start'>
+                        <button
+                            type="submit"
+                            className="btn-primary min-w-[15px] mb-7 "
+                            onClick={handleBack}
+                        >
+                            <ArrowLeft className='mr-6 h-5 w-5' />
+                            Back
+                        </button>
+                    </div>
 
                     {isAddingCard && (
                         <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
@@ -81,14 +105,14 @@ const QLThe = () => {
                                     <div className=' space-y-4'>
                                         <div className="form-control">
                                             <label className="label">
-                                                <span className="label-text text-lg font-medium  ">IDCard</span>
+                                                <span className="label-text text-lg font-medium  ">Identification</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 className="input input-bordered"
-                                                placeholder="IDCard"
-                                                value={formData.IdCard}
-                                                onChange={(e) => setFormData({ ...formData, IdCard: e.target.value })}
+                                                placeholder="Identification"
+                                                value={formData.Identification}
+                                                onChange={(e) => setFormData({ ...formData, Identification: e.target.value })}
                                                 required
                                             />
                                         </div>
@@ -111,14 +135,14 @@ const QLThe = () => {
                                     <div className=' space-y-4'>
                                         <div className="form-control space-y-2">
                                             <label className="label">
-                                                <span className="label-text text-lg font-medium  ">Identification </span>
+                                                <span className="label-text text-lg font-medium  ">IdCard </span>
                                             </label>
                                             <input
                                                 type="text"
                                                 className="input input-bordered"
-                                                placeholder="Identification"
-                                                value={formData.Identification}
-                                                onChange={(e) => setFormData({ ...formData, Identification: e.target.value })}
+                                                placeholder="IdCard"
+                                                value={formData.IdCard}
+                                                readOnly
                                                 required
                                             />
                                         </div>
@@ -142,14 +166,19 @@ const QLThe = () => {
                                         <label className="label">
                                             <span className="label-text text-lg font-medium  ">Status</span>
                                         </label>
-                                        <input
-                                            type="text"
-                                            className="input input-bordered"
-                                            placeholder="Status"
+                                        <select
+                                            className="select select-bordered w-full pl-10"
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                             required
-                                        />
+                                        >
+                                            <option value="" disabled>
+                                            Choice Status
+                                            </option>
+                                            <option value="Active">Active</option>
+
+                                        </select>
+                                       
                                     </div>
                                 </div>
 
@@ -214,25 +243,30 @@ const QLThe = () => {
                         <tbody>
                         {cards && cards.map((card, index) => {
                             return (
-                                <tr key={index} className={`${index % 3 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
+                                <tr key={index} className={`${index % 4 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
                                 <td className=' py-2 px-3 border text-sm'>{index + 1}</td>
                                 <td className=' py-2 px-3 border text-sm'>{card.IdCard}</td>
-                                <td className=' py-2 px-3 border text-sm'>{card.Identification.Identification}</td>
+                                <td className=' py-2 px-3 border text-sm'>{card.Identification ? card.Identification.Identification: 'N/A'}</td>
                                 <td className=' py-2 px-3 border text-sm'>{card.Identification ? card.Identification.userName : 'N/A'}</td>
                                 <td className=' py-2 px-3 border text-sm'>{card.Identification ? card.Identification.SDT : 'N/A'}</td>
                                 <td className=' py-2 px-3 border text-sm'>{new Date(card.ngayCap).toLocaleDateString()}</td>
                                 <td className=' py-2 px-3 border text-sm'>{new Date(card.ngayHetHan).toLocaleDateString()}</td>
-                                <td className=' py-2 px-3 border text-sm'>{card.status}</td>
+                                <th className = {`py-2 px-3 border text-sm 
+                                    ${
+                                        card.status === 'Active' ? 'text-green-800': 
+                                        card.status === 'Overdue' ? 'text-red-700' :
+                                        card.status === 'Suspend' ? 'text-yellow-400': ''
+                                    }
+                                `}>{card.status}</th>
                                 </tr>
                             );
                         })}
                         </tbody>
                     </table>
-
                     </div>
                 </div>
                 
-            </div>
+            </div>    
         </div>
     )
 }

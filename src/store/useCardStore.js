@@ -37,7 +37,14 @@ export const useCardStore = create((set, get) => ({
     } catch (error) {
       console.error("Error searching card:", error)
       toast.error("Failed to search cards.")
-      return []
+      return null
+    }
+  },
+  checkAndUpdateStatusCard: async()=>{
+    try {
+      await axiosInstance.post("/checkStatusCard")
+    } catch (error) {
+      console.error('Error check-update Status', error)
     }
   },
 

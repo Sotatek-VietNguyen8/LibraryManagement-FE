@@ -1,43 +1,44 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../Navbar'
-import { useDocketStore } from '../../store/useDocketStore'
-import { FileTextIcon, UserIcon, BookIcon, CalendarIcon, ArrowLeft } from 'lucide-react'
-import { useAuthStore } from '../../store/useAuthStore'
-import { useCardStore } from '../../store/useCardStore'
-import { useBookStore } from '../../store/useBookStore'
-import { useNavigate } from 'react-router-dom'
-import toast from 'react-hot-toast'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../Navbar';
+import { useDocketStore } from '../../store/useDocketStore';
+import { FileTextIcon, UserIcon, BookIcon, CalendarIcon, ArrowLeft, BookKey } from 'lucide-react';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useCardStore } from '../../store/useCardStore';
+import { useBookStore } from '../../store/useBookStore';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const CreateDocket = () => {
-    const { creatDocket } = useDocketStore()
-    const { authUser } = useAuthStore()
-    const { searchCard } = useCardStore()
-    const [isCardLoading, setIsCardLoading] = useState(false)
-    const [isBookLoading, setIsBookLoading] = useState(false)
+    const { creatDocket } = useDocketStore();
+    const { authUser } = useAuthStore();
+    const { searchCard } = useCardStore();
+    const { getBookById } = useBookStore();
+    const [isCardLoading, setIsCardLoading] = useState(false);
+    const [isBookLoading, setIsBookLoading] = useState(false);
 
     const generateRandomCharacters = () => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        let result = ''
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
         for (let i = 0; i < 2; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length))
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
         }
-        return result
-    }
+        return result;
+    };
     const generateRandomNumbers = () => {
-        return Math.floor(Math.random() * 90000) + 10000
-    }
+        return Math.floor(Math.random() * 90000) + 10000;
+    };
     const generateRandomIdDocket = () => {
-        const character = generateRandomCharacters()
-        const number = generateRandomNumbers()
-        return `${character}-${number}`
-    }
+        const character = generateRandomCharacters();
+        const number = generateRandomNumbers();
+        return `${character}-${number}`;
+    };
 
     const formatDate = (date) => {
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        return `${year}-${month}-${day}`
-    }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     const calculateDefaultReturnDate = (startDate) => {
         const returnDate = new Date(startDate);
@@ -45,15 +46,9 @@ const CreateDocket = () => {
         return formatDate(returnDate);
     };
 
-    useEffect(() => {
-        const today = new Date()
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            IdDocket: generateRandomIdDocket(),
-            ngayMuon: formatDate(today),
-            ngayHenTra: calculateDefaultReturnDate(today),
-        }))
-    }, [])
+    const today = new Date();
+    const initialNgayMuon = formatDate(today);
+    const initialNgayHenTra = calculateDefaultReturnDate(today);
 
     const [formData, setFormData] = useState({
         IdDocket: '',
@@ -63,40 +58,59 @@ const CreateDocket = () => {
         Identification: '',
         userName: '',
         SDT: '',
-        ngayMuon: formatDate(new Date()),
-        ngayHenTra: calculateDefaultReturnDate(new Date()),
+        ngayMuon: initialNgayMuon,
+        ngayHenTra: initialNgayHenTra,
         ngayTra: '',
-        status: ''
-    })
-    const [isSubmitting, setIsSubmitting] = useState(false)
+        status: '',
+        soLuongMuon: '',
+        soLuongCon: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    useEffect(() => {
+          setFormData(prevFormData => ({
+              ...prevFormData,
+              IdDocket: generateRandomIdDocket()
+          }))
+      }, [])
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setIsSubmitting(true)
+        e.preventDefault();
+        setIsSubmitting(true);
 
-        const ngayMuonDate = new Date(formData.ngayMuon)
-        const ngayHenTraDate = new Date(formData.ngayHenTra)
+        if (parseInt(formData.soLuongMuon) > parseInt(formData.soLuongCon) || !formData.soLuongCon) {
+            toast.error("Số lượng mượn vượt quá số lượng sách còn lại!");
+            setIsSubmitting(false);
+            return;
+        }
+
+        const ngayMuonDate = new Date(formData.ngayMuon);
+        const ngayHenTraDate = new Date(formData.ngayHenTra);
+
         if (isNaN(ngayHenTraDate.getTime())) {
-            toast.error("Vui lòng chọn ngày hẹn trả hợp lệ.")
-            setIsSubmitting(false)
-            return
+            toast.error("Vui lòng chọn ngày hẹn trả hợp lệ.");
+            setIsSubmitting(false);
+            return;
         }
-        const maxHenTra = new Date(ngayMuonDate)
-        maxHenTra.setMonth(ngayMuonDate.getMonth() + 4)
+
+        const maxHenTra = new Date(ngayMuonDate);
+        maxHenTra.setMonth(ngayMuonDate.getMonth() + 4);
+
         if (ngayHenTraDate.getTime() > maxHenTra.getTime()) {
-            toast.error("Hẹn trả vượt quá 4 tháng!")
-            setIsSubmitting(false)
-            return
+            toast.error("Hẹn trả vượt quá 4 tháng!");
+            setIsSubmitting(false);
+            return;
         }
+
         try {
             const docketData = await creatDocket({
                 ...formData,
                 ngayMuon: new Date(formData.ngayMuon),
                 ngayHenTra: new Date(formData.ngayHenTra)
-            })
+            });
+
             if (docketData) {
-                console.log('Create Docket: ', formData)
-                const today = new Date()
+                console.log('Create Docket: ', formData);
+                const today = new Date();
                 setFormData(prevFormData => ({
                     IdDocket: generateRandomIdDocket(),
                     IdCard: '',
@@ -108,17 +122,19 @@ const CreateDocket = () => {
                     ngayMuon: formatDate(today),
                     ngayHenTra: calculateDefaultReturnDate(today),
                     ngayTra: '',
-                    status: ''
-                }))
-                setIsSubmitting(false)
+                    status: '',
+                    soLuongMuon: '',
+                    soLuongCon: ''
+                }));
+                setIsSubmitting(false);
             }
         } catch (error) {
-            console.log('Error on submit CreateDocketForm: ', error)
-            toast.error(error.response?.data?.message || "Failed to create docket")
+            console.log('Error on submit CreateDocketForm: ', error);
+            toast.error(error.response?.data?.message || "Failed to create docket");
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
-    }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -139,14 +155,14 @@ const CreateDocket = () => {
 
     useEffect(() => {
         const loadCard = async () => {
-            setIsCardLoading(true)
+            setIsCardLoading(true);
             try {
                 if (formData.IdCard) {
-                    const cardData = await searchCard(formData.IdCard)
+                    const cardData = await searchCard(formData.IdCard);
 
                     if (cardData && cardData.length > 0) {
 
-                        const findCard = cardData.find(card => card.IdCard === formData.IdCard)
+                        const findCard = cardData.find(card => card.IdCard === formData.IdCard);
 
                         if (findCard) {
                             setFormData(prev => ({
@@ -154,46 +170,31 @@ const CreateDocket = () => {
                                 Identification: findCard.Identification?.Identification || '',
                                 userName: findCard.Identification?.userName || '',
                                 SDT: findCard.Identification?.SDT || '',
-                            }))
+                            }));
                         } else {
                             setFormData(prev => ({
                                 ...prev,
                                 Identification: '',
                                 userName: '',
                                 SDT: '',
-                            }))
+                            }));
                         }
                     }
                 }
             } catch (error) {
-                console.log("Failed to load card")
+                console.log("Failed to load card");
             } finally {
-                setIsCardLoading(false)
+                setIsCardLoading(false);
             }
-        }
+        };
 
-        loadCard()
+        loadCard();
 
-    }, [formData.IdCard, searchCard])
+    }, [formData.IdCard, searchCard]);
 
-    const { getBookById, getBook } = useBookStore()
-    useEffect(() => {
-        const loadBook = async () => {
-            setIsBookLoading(true)
-            try {
-                await getBook()
-            } catch (error) {
-                console.log("Failed to load book");
-            } finally {
-                setIsBookLoading(false);
-            }
-        }
-
-        loadBook()
-    }, [])
     useEffect(() => {
         const loadBookId = async () => {
-            setIsBookLoading(true)
+            setIsBookLoading(true);
             try {
                 if (formData.IdBook) {
                     const bookData = await getBookById(formData.IdBook);
@@ -201,17 +202,20 @@ const CreateDocket = () => {
                         setFormData(prev => ({
                             ...prev,
                             bookName: bookData.bookName,
+                            soLuongCon: bookData.soLuongCon,
                         }));
                     } else {
                         setFormData(prev => ({
                             ...prev,
                             bookName: '',
+                            soLuongCon: '',
                         }));
                     }
                 } else {
                     setFormData(prev => ({
                         ...prev,
                         bookName: '',
+                        soLuongCon: ''
                     }));
                 }
             } catch (error) {
@@ -219,16 +223,16 @@ const CreateDocket = () => {
             } finally {
                 setIsBookLoading(false);
             }
-        }
+        };
 
-        loadBookId()
+        loadBookId();
 
-    }, [formData.IdBook, getBookById])
+    }, [formData.IdBook, getBookById]);
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const handleBack = () => {
-        navigate(-1)
-    }
+        navigate(-1);
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -371,6 +375,20 @@ const CreateDocket = () => {
                                     </div>
                                     <div className='form-control mb-4'>
                                         <label className="label">
+                                            <span className="label-text text-sm font-medium">So luong sach con lai</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="input input-bordered"
+                                            placeholder=""
+                                            value={formData.soLuongCon}
+                                            readOnly
+                                            name='soLuongCon'
+                                            required
+                                        />
+                                    </div>
+                                    <div className='form-control mb-4'>
+                                        <label className="label">
                                             <span className="label-text text-sm font-medium">Tên sách</span>
                                         </label>
                                         <input
@@ -393,19 +411,36 @@ const CreateDocket = () => {
                                     Thông tin mượn trả
                                 </h3>
 
-                                <div className='form-control mb-4'>
-                                    <label className="label">
-                                        <span className="label-text text-sm font-medium">Ngày hẹn trả </span>
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="input input-bordered"
-                                        placeholder="dd/mm/yyyy"
-                                        value={formData.ngayHenTra}
-                                        onChange={handleInputChange}
-                                        name='ngayHenTra'
-                                        required
-                                    />
+                                <div className='grid grid-cols-2 gap-4'>
+                                    <div className='form-control mb-4'>
+                                        <label className="label">
+                                            <span className="label-text text-sm font-medium">So luong muon</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="input input-bordered"
+                                            placeholder='1'
+                                            value={formData.soLuongMuon}
+                                            onChange={handleInputChange}
+                                            name='soLuongMuon'
+                                            min="1"
+                                            required
+                                        />
+                                    </div>
+                                    <div className='form-control mb-4'>
+                                        <label className="label">
+                                            <span className="label-text text-sm font-medium">Ngày hẹn trả </span>
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="input input-bordered"
+                                            placeholder="dd/mm/yyyy"
+                                            value={formData.ngayHenTra}
+                                            onChange={handleInputChange}
+                                            name='ngayHenTra'
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
